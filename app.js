@@ -21,6 +21,9 @@ var Player = function(id){
 		y:200,
 		vel: 10,
 		id:id,
+		x_aim:0,
+		y_aim:0,
+		skill:"none",
 		number:"" + Math.floor(100*Math.random())
 	}
 	self.updatePosition = function(key){
@@ -60,6 +63,11 @@ io.sockets.on('connection',function(socket){
 	socket.on('d',function(){
 		player.updatePosition('d')
 	});
+	socket.on('aim_skill',function(data){
+		player.x_aim=data.x,
+		player.y_aim=data.y,
+		player.skill=data.skill
+	});
 
 });
 
@@ -70,6 +78,9 @@ setInterval(function(){
 		pack.push({
 			x:player.x,
 			y:player.y,
+			x_aim:player.x_aim,
+			y_aim:player.y_aim,
+			skill:player.skill,
 			id:player.number
 		});
 	}
