@@ -18,7 +18,7 @@
 			//ctx.save();
 			//ctx.translate(data[i].x+window.innerWidth/2,data[i].y+window.innerHeight/2);
 			ctx.fillText(data[i].id,data[i].x,data[i].y);
-			console.log(data[i].x+"  "+data[i].y)
+			console.log(data[i].x_aim+"  "+data[i].y_aim)
 		}
 	});
 	document.onkeydown = function(event){
@@ -35,4 +35,11 @@
 			socket.emit('d')
 		}
 	}
+	document.onmousedown = function (event) {
+	    socket.emit('aim_skill',{
+	    	x:event.clientX,
+	    	y:event.clientY,
+	    	slack:"attack"
+	    });
+	} 
 </script>
