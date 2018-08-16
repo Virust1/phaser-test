@@ -1,45 +1,23 @@
+<!DOCTYPE html>
 <canvas id="ctx"
 	width = "1280px",
     height ="720px";>
 </canvas>
 
-
+<head>
+	<meta charset='utf-8' />
+	<meta name="viewport" content="width=device-width,maximum-scale=1,user-scalable=no" />
+	<script type="text/javascript" src="client/js/phaser.js"></script>
+	<style>
+		body{
+			padding:0px;
+			margin:0px;
+			background: black;
+		}
+	</style>
+</head>
 
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"> </script>
-<script>
-	var canvas = document.getElementById("ctx"),
-    ctx = canvas.getContext("2d");
-	ctx.font = "40px Arial";
-	var socket = io();
-	socket.on('new_position',function(data){
-		ctx.clearRect(0,0,canvas.width,canvas.height);
-		ctx.fillStyle = "black";
-		for(var i = 0; i <data.length;i++){
-			//ctx.save();
-			//ctx.translate(data[i].x+window.innerWidth/2,data[i].y+window.innerHeight/2);
-			ctx.fillText(data[i].id,data[i].x,data[i].y);
-			console.log(data[i].x_aim+"  "+data[i].y_aim)
-		}
-	});
-	document.onkeydown = function(event){
-		if(event.keyCode == 87){
-			socket.emit('w');
-		}
-		else if(event.keyCode == 83){
-			socket.emit('s');
-		}
-		if(event.keyCode == 65){
-			socket.emit('a')
-		}
-		else if(event.keyCode == 68){
-			socket.emit('d')
-		}
-	}
-	document.onmousedown = function (event) {
-	    socket.emit('aim_skill',{
-	    	x:event.clientX,
-	    	y:event.clientY,
-	    	slack:"attack"
-	    });
-	} 
-</script>
+<body>
+	<script type="text/javascript" src="client/js/main.js"></script>
+</body>
