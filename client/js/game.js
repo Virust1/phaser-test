@@ -5,37 +5,39 @@ var config = {
     scene: {
         preload: preload,
         create: create,
-        update: update
+        update: update,
+        render: render
     }
 };
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(config);
 
 function preload () {
-  game.load.image('background', 'assets/grid.png');
-  game.load.image('player', 'assets/player.png');
+  this.load.image('background', 'client/assets/grid.png');
+  this.load.image('player', 'client/assets/player.png');
 }
 
 var player;
 var cursors;
 
 function create () {
-  game.add.tileSprite(0, 0, 6000, 6000, 'background');
-  game.world.setBounds(0, 0, 6000, 6000);
+  this.add.tileSprite(0, 0, 6000, 6000, 'background');
+  //this.scene.setBounds(0, 0, 6000, 6000);
 
-  player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
-  player.anchor.setTo(0.5, 0.5);
+  player = this.add.sprite(this.scene.centerX, this.scene.centerY, 'player');
+  //player.anchor.setTo(0.5, 0.5);
 
-  game.physics.startSystem(Phaser.Physics.P2JS);
-  game.physics.p2.enable(player);
+  //this.physics.startSystem(Phaser.Physics.P2JS);
+  //this.physics.p2.enable(player);
 
-  cursors = game.input.keyboard.createCursorKeys();
+  cursors = this.input.keyboard.createCursorKeys();
 
-  game.camera.follow(player);
+  this.cameras.main.scrollX= player.x-400
+  this.cameras.main.scrollY = player.y-300
+
 }
-
 function update() {
-  player.body.setZeroVelocity();
+  //player.body.setZeroVelocity(0,0);
 
   if (cursors.up.isDown) {
     player.body.moveUp(300)
@@ -53,8 +55,8 @@ function update() {
 }
 
 function render() {
-  game.debug.cameraInfo(game.camera, 32, 32);
-  game.debug.spriteCoords(player, 32, 500);
+  this.debug.cameraInfo(this.camera, 32, 32);
+  this.debug.spriteCoords(player, 32, 500);
 }
 /*
 var canvas = document.getElementById("ctx"),
