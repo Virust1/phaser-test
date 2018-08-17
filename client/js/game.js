@@ -1,63 +1,109 @@
-var config = {
-    type: Phaser.CANVAS,
-    width: 800,
-    height: 600,
-    scene: {
-        preload: preload,
-        create: create,
-        update: update,
-        render: render
-    }
-};
+var socket = io();
 
-var game = new Phaser.Game(config);
-
-function preload () {
-  this.load.image('background', 'client/assets/grid.png');
-  this.load.image('player', 'client/assets/player.png');
+var loc = {
+  x: 400,
+  y: 300
 }
 
-var player;
-var cursors;
-
-function create () {
-  this.add.tileSprite(0, 0, 6000, 6000, 'background');
-  //this.scene.setBounds(0, 0, 6000, 6000);
-
-  player = this.add.sprite(this.scene.centerX, this.scene.centerY, 'player');
-  //player.anchor.setTo(0.5, 0.5);
-
-  //this.physics.startSystem(Phaser.Physics.P2JS);
-  //this.physics.p2.enable(player);
-
-  cursors = this.input.keyboard.createCursorKeys();
-
-  this.cameras.main.scrollX= player.x-400
-  this.cameras.main.scrollY = player.y-300
-
-}
-function update() {
-  //player.body.setZeroVelocity(0,0);
-
-  if (cursors.up.isDown) {
-    player.body.moveUp(300)
-  }
-  else if (cursors.down.isDown) {
-    player.body.moveDown(300);
-  }
-
-  if (cursors.left.isDown) {
-    player.body.velocity.x = -300;
-  }
-  else if (cursors.right.isDown) {
-    player.body.moveRight(300);
-  }
+var movement = {
+  up: false,
+  down: false,
+  left: false,
+  right: false
 }
 
-function render() {
-  this.debug.cameraInfo(this.camera, 32, 32);
-  this.debug.spriteCoords(player, 32, 500);
+
+setInterval(function() {
+  move();
+}, 1000 / 60);
+
+function move() {
+  if(movement.left) {
+    loc.x-=10;
+  }
+  if(movement.right) {
+    loc.x+=10;
+  }
+  if(movement.down) {
+    loc.y+=10;
+  }
+  if(movement.up) {
+    loc.y-=10;
+  }
 }
+var canvas = document.getElementById('ctx');
+var ctx = canvas.getContext('2d');
+socket.on('state', function(players) {
+  ctx.fillStyle = 'black';
+  ctx.font = "40px Arial";
+  ctx.fillRect(0, 0, 1280, 760);
+  ctx.strokeStyle = 'white';
+  var i;
+  for(i = -loc.x%50; i<800; i+=50) {
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i, 600);
+    ctx.lineWidth = 5;
+    ctx.stroke();
+  }
+  var j;
+  for(j = -loc.y%50; j<600; j+=50) {
+    ctx.beginPath();
+    ctx.moveTo(0, j);
+    ctx.lineTo(800, j);
+    ctx.lineWidth = 5;
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = 'white';
+  
+  for (var i=0; i<players.length; i++) {
+    var player = players[i];
+    var xdif = 400-player.camx;
+    var ydif = 300-player.camy;
+    ctx.beginPath();
+    ctx.arc(player.x+xdif, player.y+ydif, 10, 0, 2 * Math.PI);
+    ctx.fill();
+    //ctx.clearRect(player.x - (1280/2), player.y - (760/2), 1280, 760);
+    //ctx.fillText(players[i].id,players[i].x,players[i].y);
+    console.log(players[i].id+" "+players[i].x+ "  "+players[i].y);
+  }
+});
+document.addEventListener('keydown',function(event){
+  if(event.keyCode == 87){
+    movement.up=true;
+    
+  }
+  if(event.keyCode == 83){
+    movement.down=true;
+    
+  }
+  if(event.keyCode == 65){
+    movement.left = true;
+    
+  }
+  if(event.keyCode == 68){
+    movement.right=true;
+  }
+  socket.emit('movement',movement);
+});
+document.addEventListener('keyup',function(event){
+  if(event.keyCode == 87){
+    movement.up=false;
+    
+  }
+  if(event.keyCode == 83){
+    movement.down=false;
+  }
+  if(event.keyCode == 65){
+    movement.left = false;
+    
+  }
+  if(event.keyCode == 68){
+    movement.right=false;
+  }
+  socket.emit('movement',movement);
+});
 /*
 var canvas = document.getElementById("ctx"),
 ctx = canvas.getContext("2d");
