@@ -17,8 +17,10 @@ var player_list = [];
 
 var Player = function(id){
 	var self = {
-		x:200,
-		y:200,
+		x:400,
+		y:300,
+		camx:400,
+		camy:300,
 		vel: 10,
 		id:id,
 		x_aim:0,
@@ -27,14 +29,22 @@ var Player = function(id){
 		number:"" + Math.floor(100*Math.random())
 	}
 	self.updatePosition = function(key){
-		if(key == 'd')
-			self.x += self.vel
-		if(key == 'a')
-			self.x -= self.vel
-		if(key == 'w')
-			self.y -= self.vel
-		if(key == 's')
-			self.y += self.vel
+		if(key.left){
+			self.x -= self.vel;
+			self.camx -=self.vel;
+		}
+		if(key.right){
+			self.x += self.vel;
+			self.camx +=self.vel;;
+		}
+		if(key.up){
+			self.y -= self.vel;
+			self.camy-=self.vel;
+		}
+		if(key.down){
+			self.y += self.vel;
+			self.camy+=self.vel;
+		}
 	}
 	return self;
 }
@@ -51,17 +61,8 @@ io.sockets.on('connection',function(socket){
 		delete socket_list[socket.id];
 		delete player_list[socket.id];
 	});
-	socket.on('w',function(){
-		player.updatePosition('w')
-	});
-	socket.on('a',function(){
-		player.updatePosition('a')
-	});
-	socket.on('s',function(){
-		player.updatePosition('s')
-	});
-	socket.on('d',function(){
-		player.updatePosition('d')
+	socket.on('movement',function(data){
+		player.updatePosition(data)
 	});
 	socket.on('aim_skill',function(data){
 		player.x_aim=data.x,
@@ -71,6 +72,7 @@ io.sockets.on('connection',function(socket){
 
 });
 
+
 setInterval(function(){
 	var pack = [];
 	for(var i in player_list){
@@ -78,6 +80,8 @@ setInterval(function(){
 		pack.push({
 			x:player.x,
 			y:player.y,
+			camx:player.camx,
+			camy:player.camy,
 			x_aim:player.x_aim,
 			y_aim:player.y_aim,
 			skill:player.skill,
@@ -86,7 +90,7 @@ setInterval(function(){
 	}
 	for(var i in socket_list){
 		var socket = socket_list[i];
-		socket.emit('new_position',pack)
+		socket.emit('state',pack)
 	}
 },1000/25);
 
